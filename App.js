@@ -1,13 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
 import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 import * as MediaLibrary from 'expo-media-library';
 import { Audio } from 'expo-av';
 
+import Title from './Title';
+import Controls from './Controls';
+import AlbumList from './AlbumList';
+
 export default function App() {
     const [sound, setSound] = useState();
+    const [musicArray, setMusicArray] = useState([]);
+    const [showAlbumList, setShowAlbumList] = useState(false);
 
     const AskForPermission = async () => {
         const permission = await MediaLibrary.requestPermissionsAsync();
@@ -29,6 +35,18 @@ export default function App() {
         } else console.error("Could not prepareAudio!");
     };
 
+    const prepareMusicArray = async () => {
+        const perm = await AskForPermission();
+        if (perm) {
+            const media = await MediaLibrary.getAssetsAsync({
+                mediaType: MediaLibrary.MediaType.audio
+            });
+            setMusicArray(media.assets);
+
+        } else console.error("Could not prepareMusicArray");
+    };
+
+    // Unload sound
     React.useEffect(() => {
         return sound
           ? () => {
@@ -47,21 +65,39 @@ export default function App() {
         const pause = await sound.pauseAsync();
     };
 
-    return (
-        <View style={styles.container}>
-            <Text>Hello World</Text>
-            <Button onPress={() => prepareAudio("file:///storage/emulated/0/Music/Over the Horizon.mp3")} title='LoadSong'></Button>
-            <Button onPress={() => PlayAudio()} title='Play'></Button>
-            <Button onPress={() => PauseAudio()} title='Pause'></Button>
-            <StatusBar style="auto" />
-        </View>
-    );
+    const onClickShowAlbumList = async (value) => {
+        // Get the music array only once when we go into the albumList
+        // this can be done by checking array length because it starts empty
+        if (!musicArray.length) {
+            await prepareMusicArray();
+        }
+
+        setShowAlbumList(value);
+    };
+
+    if (showAlbumList) {
+        return (
+            <View style={styles.container}>
+                <AlbumList onClickShowAlbumList={onClickShowAlbumList} musicArray={musicArray} prepareAudio={prepareAudio}/>
+                <StatusBar hidden={true} />
+            </View>
+        );
+    } else if (!showAlbumList) {
+        return (
+            <View style={styles.container}>
+                <Title onClickShowAlbumList={onClickShowAlbumList}/>
+                <Controls play={PlayAudio} pause={PauseAudio}/>
+                <StatusBar hidden={true} />
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
     container: {
+        flexDirection: 'column',
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: 'grey',
         alignItems: 'center',
         justifyContent: 'center',
     },
