@@ -13,7 +13,7 @@ export default function Title(props) {
             </View>
         </View>
         <View style={styles.titleDiv}>
-            <Text style={styles.title}>Song Name</Text>
+            <Text style={styles.title}>{props.currentSong.filename}</Text>
         </View>
     </>
     );

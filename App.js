@@ -14,6 +14,7 @@ export default function App() {
     const [sound, setSound] = useState();
     const [musicArray, setMusicArray] = useState([]);
     const [showAlbumList, setShowAlbumList] = useState(false);
+    const [currentSong, setCurrentSong] = useState({filename: 'No song selected'});
 
     const AskForPermission = async () => {
         const permission = await MediaLibrary.requestPermissionsAsync();
@@ -56,13 +57,15 @@ export default function App() {
       }, [sound]);
 
     const PlayAudio = async () => {
-        if (sound._loaded) {
+        if (sound != undefined && sound._loaded) {
             const play = await sound.playAsync();
         } else console.log("Sound has not been loaded yet");
     }
 
     const PauseAudio = async () => {
-        const pause = await sound.pauseAsync();
+        if (sound != undefined && sound._loaded) {
+            const pause = await sound.pauseAsync();
+        } else console.log("Sound has not been loaded yet");
     };
 
     const onClickShowAlbumList = async (value) => {
@@ -78,14 +81,14 @@ export default function App() {
     if (showAlbumList) {
         return (
             <View style={styles.container}>
-                <AlbumList onClickShowAlbumList={onClickShowAlbumList} musicArray={musicArray} prepareAudio={prepareAudio}/>
+                <AlbumList onClickShowAlbumList={onClickShowAlbumList} musicArray={musicArray} prepareAudio={prepareAudio} setCurrentSong={setCurrentSong}/>
                 <StatusBar hidden={true} />
             </View>
         );
     } else if (!showAlbumList) {
         return (
             <View style={styles.container}>
-                <Title onClickShowAlbumList={onClickShowAlbumList}/>
+                <Title onClickShowAlbumList={onClickShowAlbumList} currentSong={currentSong}/>
                 <Controls play={PlayAudio} pause={PauseAudio}/>
                 <StatusBar hidden={true} />
             </View>
