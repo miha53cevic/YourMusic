@@ -17,17 +17,19 @@ export default function Controls(props) {
         }
     };
 
+    // Render components
     return (
         <View style={styles.controlDiv}>
             <View style={styles.mediaControls}>
-                <Entypo style={styles.backControl} name="controller-jump-to-start" size={96} color="white" />
+                <Entypo style={styles.backControl} name="controller-jump-to-start" size={48} color="white" />
                 <FontAwesome onPress={() => onClickPlayPause()} style={styles.playPause} name={playPause} size={96} color="white" />
-                <Entypo style={styles.forwControl} name="controller-next" size={96} color="white" />
+                <Entypo style={styles.forwControl} name="controller-next" size={48} color="white" />
             </View>
         </View>
     );
 }
 
+// CSS
 const styles = StyleSheet.create({
     controlDiv: {
         width: '100%',
