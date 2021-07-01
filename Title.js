@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Ionicons } from '@expo/vector-icons';
+import IconIonicons from 'react-native-vector-icons/Ionicons';
+import Screens from './Screens';
 
 export default function Title(props) {
 
@@ -10,17 +11,17 @@ export default function Title(props) {
     <>
         <View style={styles.topBarDiv}>
             <View style={styles.buttonDiv}>
-                <Ionicons name="options" size={48} color="#FFFFFF00" />
+                <IconIonicons name="options" size={48} color="#FFFFFF00" />
             </View>
             <Text style={styles.topBarText}>
                 Home
             </Text>
             <View style={styles.buttonDiv}>
-                <Ionicons name="options" size={48} color="white" onPress={() => props.onClickShowAlbumList(true)}/>
+                <IconIonicons name="options" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.OPTIONS)} />
             </View>
         </View>
         <View style={styles.titleDiv}>
-            <Text style={styles.title}>{props.currentSong.title || props.currentSong}</Text>
+            <Text style={styles.title}> Title Name </Text>
         </View>
     </>
     );

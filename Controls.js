@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Entypo } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
+import IconEntypo from 'react-native-vector-icons/Entypo';
+import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
+import States from './States';
 
 export default function Controls(props) {
     const [playPause, setPlayPause] = React.useState('play-circle');
@@ -10,10 +11,10 @@ export default function Controls(props) {
     const onClickPlayPause = () => {
         if (playPause === 'play-circle') {
             setPlayPause('pause-circle');
-            props.play();
+            props.setState(States.PLAYING)
         } else if (playPause === 'pause-circle') {
             setPlayPause('play-circle');
-            props.pause();
+            props.setState(States.PAUSED);
         }
     };
 
@@ -21,9 +22,9 @@ export default function Controls(props) {
     return (
         <View style={styles.controlDiv}>
             <View style={styles.mediaControls}>
-                <Entypo style={styles.backControl} name="controller-jump-to-start" size={48} color="white" />
-                <FontAwesome onPress={() => onClickPlayPause()} style={styles.playPause} name={playPause} size={96} color="white" />
-                <Entypo style={styles.forwControl} name="controller-next" size={48} color="white" />
+                <IconEntypo style={styles.backControl} name="controller-jump-to-start" size={48} color="white" />
+                <IconFontAwesome onPress={() => onClickPlayPause()} style={styles.playPause} name={playPause} size={96} color="white" />
+                <IconEntypo style={styles.forwControl} name="controller-next" size={48} color="white" />
             </View>
         </View>
     );

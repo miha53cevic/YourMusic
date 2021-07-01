@@ -1,34 +1,31 @@
 import React from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 
-import { AntDesign } from '@expo/vector-icons';
+import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import Screens from './Screens';
 
 export default function AlbumList(props) {
-
-    const onItemPress = (albumTitle) => {
-        props.setCurrentAlbum(albumTitle);
-    };
 
     // Render components
     return (
         <>
             <View style={styles.topBarDiv}>
                 <View style={styles.buttonDiv}>
-                    <AntDesign name="back" size={48} color="#FFFFFF00" />
+                    <IconAntDesign name="back" size={48} color="#FFFFFF00" />
                 </View>
                 <Text style={styles.topBarText}>
                     Choose song folder
                 </Text>
                 <View style={styles.buttonDiv}>
-                    <AntDesign onPress={() => props.onClickShowAlbumList(false)} name="back" size={48} color="white" />
+                    <IconAntDesign name="back" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.HOME)} />
                 </View>
             </View>
             <FlatList
                 keyExtractor = {(item) => item.toString()}
-                data = {props.albums}
+                data = {null}
                 renderItem={({item}) =>
                 <View style={styles.backgroundDiv} >
-                    <Text onPress={() => onItemPress(item)}>{item}</Text>
+                    <Text >{item}</Text>
                 </View> 
             }
             />
