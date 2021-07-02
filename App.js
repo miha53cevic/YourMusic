@@ -9,6 +9,7 @@ import AlbumList from './AlbumList';
 
 import Screens from './Screens';
 import States from './States';
+import ProgressBar from './ProgressBar';
 
 import TrackPlayer, { useTrackPlayerEvents, useTrackPlayerProgress } from 'react-native-track-player';
 
@@ -81,6 +82,8 @@ export default function App() {
 
                 <Title setCurrentScreen={setCurrentScreen} resetPlayer={resetPlayer}
                     trackTitle={trackTitle} />
+
+                <ProgressBar />
 
                 <Controls state={state} setState={setState}
                     TrackPlayer={TrackPlayer} />
