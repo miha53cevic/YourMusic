@@ -9,6 +9,8 @@ import States from './States';
 export default function Controls(props) {
     const [playPause, setPlayPause] = React.useState('play-circle');
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     const onClickPlayPause = () => {
         if (playPause === 'play-circle') {
             setPlayPause('pause-circle');
@@ -31,6 +33,8 @@ export default function Controls(props) {
         .catch(error => console.error(error));
     }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     // Render components
     return (
         <View style={styles.controlDiv}>
@@ -42,6 +46,8 @@ export default function Controls(props) {
         </View>
     );
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS
 const styles = StyleSheet.create({

@@ -7,10 +7,14 @@ import Screens from './Screens';
 
 export default function Title(props) {
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     async function switchOptions() {
         await props.resetPlayer();
         props.setCurrentScreen(Screens.OPTIONS)
     }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
     // Render components
     return (
@@ -27,11 +31,13 @@ export default function Title(props) {
             </View>
         </View>
         <View style={styles.titleDiv}>
-            <Text style={styles.title}> Title Name </Text>
+            <Text style={styles.title}> {props.trackTitle} </Text>
         </View>
     </>
     );
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS
 const styles = StyleSheet.create({

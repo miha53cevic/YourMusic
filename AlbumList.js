@@ -13,6 +13,8 @@ export default function AlbumList(props) {
     // albumList can't be here because everytime we switch screens
     // we lose states from those components because they aren't initialized
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     async function getMusicFiles() {
 
         // Find every song that is a .mp3
@@ -31,14 +33,16 @@ export default function AlbumList(props) {
                 musicMap.set(subfolder, []);
             }
 
+            const duration = track.duration / 1000;            
             const formatedTrack = {
                 url: track.contentUri,
-                duration: track.duration,
-                title: track.name,
+                duration: duration,
+                title: track.title,
+                id: track.id,
             };
             musicMap.get(subfolder).push(formatedTrack);
         }
-        //console.log(musicMap);
+        console.log(musicMap);
         props.setMusicFiles(musicMap);
 
         // create albums array for FlatList
@@ -92,6 +96,8 @@ export default function AlbumList(props) {
         console.log(`playAlbum() called with album: ${album}`)
     }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     // Render components
     return (
         <>
@@ -120,6 +126,8 @@ export default function AlbumList(props) {
         </>
     );
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS
 const styles = StyleSheet.create({
