@@ -11,12 +11,13 @@ import Screens from './Screens';
 import States from './States';
 
 import TrackPlayer from 'react-native-track-player';
-import Music from 'react-native-get-music-files';
 
 export default function App() {
     const [sound, setSound] = useState();
     const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
     const [state, setState] = useState(States.PAUSED);
+    const [musicFiles, setMusicFiles] = useState(null);
+    const [musicArray, setMusicArray] = useState([]);
 
     // Render components
     if (currentScreen == Screens.HOME) {
@@ -33,7 +34,9 @@ export default function App() {
             <View style={styles.container}>
                 <StatusBar hidden={true} />
 
-                <AlbumList setCurrentScreen={setCurrentScreen} />
+                <AlbumList setCurrentScreen={setCurrentScreen} 
+                            musicFiles={musicFiles} setMusicFiles={setMusicFiles} 
+                            setMusicArray={setMusicArray} />
             </View>
         );
     }
