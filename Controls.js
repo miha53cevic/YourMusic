@@ -5,6 +5,7 @@ import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import States from './States';
 
+
 export default function Controls(props) {
     const [playPause, setPlayPause] = React.useState('play-circle');
 
@@ -18,13 +19,25 @@ export default function Controls(props) {
         }
     };
 
+    const onClickForward = async() => {
+        props.TrackPlayer.skipToNext()
+        .then(_ => console.log("Skipped forward"))
+        .catch(error => console.error(error));
+    }
+
+    const onClickBackward = async() => {
+        await props.TrackPlayer.skipToPrevious()
+        .then(_ => console.log("Skipped backward"))
+        .catch(error => console.error(error));
+    }
+
     // Render components
     return (
         <View style={styles.controlDiv}>
             <View style={styles.mediaControls}>
-                <IconEntypo style={styles.backControl} name="controller-jump-to-start" size={48} color="white" />
+                <IconEntypo style={styles.backControl} name="controller-jump-to-start" size={48} color="white" onPress={() => onClickBackward()} />
                 <IconFontAwesome onPress={() => onClickPlayPause()} style={styles.playPause} name={playPause} size={96} color="white" />
-                <IconEntypo style={styles.forwControl} name="controller-next" size={48} color="white" />
+                <IconEntypo style={styles.forwControl} name="controller-next" size={48} color="white" onPress={() => onClickForward()} />
             </View>
         </View>
     );

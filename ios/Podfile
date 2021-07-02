@@ -13,7 +13,7 @@ target 'YourMusic' do
   )
 
 
-  pod 'RNReactNativeGetMusicFiles', :path => '../node_modules/react-native-get-music-files'
+
 
   target 'YourMusicTests' do
     inherit! :complete

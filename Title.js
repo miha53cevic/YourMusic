@@ -2,9 +2,15 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import IconIonicons from 'react-native-vector-icons/Ionicons';
+
 import Screens from './Screens';
 
 export default function Title(props) {
+
+    async function switchOptions() {
+        await props.resetPlayer();
+        props.setCurrentScreen(Screens.OPTIONS)
+    }
 
     // Render components
     return (
@@ -17,7 +23,7 @@ export default function Title(props) {
                 Home
             </Text>
             <View style={styles.buttonDiv}>
-                <IconIonicons name="options" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.OPTIONS)} />
+                <IconIonicons name="options" size={48} color="white" onPress={() => switchOptions()} />
             </View>
         </View>
         <View style={styles.titleDiv}>

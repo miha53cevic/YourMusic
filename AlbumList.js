@@ -1,87 +1,103 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, PermissionsAndroid } from 'react-native';
+import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight } from 'react-native';
 
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import Screens from './Screens';
 
-import MusicFiles from 'react-native-get-music-files';
+import MediaStore from 'react-native-mediastore';
 
 export default function AlbumList(props) {
-    const [albums, setAlbums] = useState([]);
+    // Note for future self
+    // albumList can't be here because everytime we switch screens
+    // we lose states from those components because they aren't initialized
 
-    const requestFilePermission = async () => {
-    try {
-        const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-            title: "Cool App File Permission",
-            message: "Cool App",
-            buttonNeutral: "Ask Me Later",
-            buttonNegative: "Cancel",
-            buttonPositive: "OK"
+    async function getMusicFiles() {
+
+        // Find every song that is a .mp3
+        let result = await MediaStore.readAudioVideoExternalMedias();
+        result.filter(r => r.name.endsWith(".mp3"));
+        console.log(`Found ${result.length} songs!`);
+
+        // Create map with all subfolders containing the songs
+        const musicMap = new Map();
+        for (const track of result) {
+            // example: content://Music/MyAlbum/track.mp3
+            const path = track.contentUri;
+
+            const subfolder = track.album;
+            if (!musicMap.has(subfolder)) {
+                musicMap.set(subfolder, []);
+            }
+
+            const formatedTrack = {
+                url: track.contentUri,
+                duration: track.duration,
+                title: track.name,
+            };
+            musicMap.get(subfolder).push(formatedTrack);
         }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log("You can use files");
-            getMusicFiles();
-        } else {
-            console.log("File permission denied");
+        //console.log(musicMap);
+        props.setMusicFiles(musicMap);
+
+        // create albums array for FlatList
+        const tempAlbum = [];
+        const iterator = musicMap.keys();
+        let album = iterator.next().value;
+        while (album != undefined) {
+            tempAlbum.push(album);
+            album = iterator.next().value;
         }
-    } catch (err) {
-        console.warn(err);
+        props.setAlbumArray(tempAlbum);
     }
+
+    async function requestFilePermission() {
+        try {
+            const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            {
+                title: "YourMusic needs Permission",
+                message: "For the app to work properly read permissions are needed",
+                buttonNeutral: "Ask Me Later",
+                buttonNegative: "Cancel",
+                buttonPositive: "OK"
+            }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log("You can use files");
+                await getMusicFiles();
+            } else {
+                console.log("File permission denied");
+                // Ask for permission again
+                requestFilePermission();
+            }
+        } catch (err) {
+            console.warn(err);
+        }
     };
 
-    function getMusicFiles() {
-        MusicFiles.getAll({
-            blured : false, // works only when 'cover' is set to true
-            artist : true,
-            duration : true, //default : true
-            cover : false, //default : true,
-            genre : false,
-            title : true,
-            cover : true,
-            minimumSongDuration : 10000, // get songs bigger than 10000 miliseconds duration,
-        }).then(tracks => {
-            // Create map with all subfolders containing the songs
-            /*const musicMap = new Map();
-            for (const track of tracks) {
-                // example: Music/MyAlbum/track.mp3
-                const path = track.path.split("/");
-
-                const subfolder = path[path.length - 2];
-                if (!musicMap.has(subfolder)) {
-                    musicMap.set(subfolder, []);
-                }
-                musicMap.get(subfolder).push(track);
-            }
-            props.setMusicFiles(musicMap);
-
-            // create albums array for list
-            const tempAlbum = [];
-            for (const album of props.MusicFiles) {
-                tempAlbum.push(album);
-            }
-            setAlbums(tempAlbum);*/
-
-        }).catch(error => {
-            console.error("getMusic() error");
-        })
+    // On first time, auto-refresh
+    if (props.musicFiles == null) {
+        requestFilePermission();
     }
 
-    // On first time, auto-refresh
-    //if (props.musicFiles == null) {
-    //    getMusicFiles();
-    //}
+    // On flatlist item press    
+    async function playAlbum(album) {
+        props.TrackPlayer.add(props.musicFiles.get(album));
+
+        // Send back to main screen
+        props.setCurrentScreen(Screens.HOME);
+
+        console.log(`playAlbum() called with album: ${album}`)
+    }
 
     // Render components
     return (
         <>
             <View style={styles.topBarDiv}>
                 <View style={styles.buttonDiv}>
-                    <IconFontAwesome name="refresh" size={48} color="white" onPress={requestFilePermission} />
+                    <IconFontAwesome name="refresh" size={48} color="white" onPress={() => requestFilePermission()} />
                 </View>
                 <Text style={styles.topBarText}>
                     Choose song folder
@@ -90,13 +106,15 @@ export default function AlbumList(props) {
                     <IconAntDesign name="back" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.HOME)} />
                 </View>
             </View>
-            <FlatList
+            <FlatList style={styles.flatlist}
                 keyExtractor = {(item) => item.toString()}
-                data = {albums}
+                data = {props.albumArray}
                 renderItem={({item}) =>
-                <View style={styles.backgroundDiv} >
-                    <Text >{item}</Text>
-                </View> 
+                <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD" onPress={() => playAlbum(item)} >
+                    <View style={styles.backgroundDiv} >
+                        <Text style={styles.listItem}> {item} </Text>
+                    </View> 
+                </TouchableHighlight>
             }
             />
         </>
@@ -127,6 +145,20 @@ const styles = StyleSheet.create({
     },
 
     backgroundDiv: {
-        margin: 16
+        margin: 16,
+        padding: 24,
+        backgroundColor: 'black',
+        borderRadius: 25,
+    },
+
+    flatlist: {
+        display: 'flex',
+        width: '100%',
+    }, 
+
+    listItem: {
+        color: 'white',
+        fontSize: 20,
+        alignSelf: 'center'
     },
 });
