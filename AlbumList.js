@@ -4,9 +4,12 @@ import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighligh
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import Screens from './Screens';
-
 import MediaStore from 'react-native-mediastore';
+
+import Screens from './Screens';
+import States from './States';
+
+import TrackPlayer from 'react-native-track-player';
 
 export default function AlbumList(props) {
     // Note for future self
@@ -19,7 +22,7 @@ export default function AlbumList(props) {
 
         // Find every song that is a .mp3
         let result = await MediaStore.readAudioVideoExternalMedias();
-        result.filter(r => r.name.endsWith(".mp3"));
+        result = result.filter(r => r.name.endsWith(".mp3")); // instead of this maybe mime starts with "audio/"
         console.log(`Found ${result.length} songs!`);
 
         // Create map with all subfolders containing the songs
@@ -88,7 +91,11 @@ export default function AlbumList(props) {
 
     // On flatlist item press    
     async function playAlbum(album) {
-        props.TrackPlayer.add(props.musicFiles.get(album));
+        // add songs to trackplayer
+        TrackPlayer.add(props.musicFiles.get(album));
+
+        // Set to autostart playing
+        props.setState(States.PLAYING);
 
         // Send back to main screen
         props.setCurrentScreen(Screens.HOME);

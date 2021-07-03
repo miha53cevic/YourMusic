@@ -7,7 +7,8 @@ import States from './States';
 
 
 export default function Controls(props) {
-    const [playPause, setPlayPause] = React.useState('play-circle');
+    const [playPause, setPlayPause] = React.useState(props.state == States.PAUSED ? 'play-circle' : 'pause-circle');
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 

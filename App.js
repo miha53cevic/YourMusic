@@ -32,7 +32,7 @@ export default function App() {
                 TrackPlayer.CAPABILITY_PAUSE,
                 TrackPlayer.CAPABILITY_SKIP_TO_NEXT,
                 TrackPlayer.CAPABILITY_SKIP_TO_PREVIOUS,
-                TrackPlayer.CAPABILITY_STOP
+                TrackPlayer.CAPABILITY_STOP,
             ],
             compactCapabilities: [
                 TrackPlayer.CAPABILITY_PLAY,
@@ -85,8 +85,8 @@ export default function App() {
 
                 <ProgressBar />
 
-                <Controls state={state} setState={setState}
-                    TrackPlayer={TrackPlayer} />
+                <Controls state={state} setState={setState} />
+                
             </View>
         );
     } else if (currentScreen == Screens.OPTIONS) {
@@ -97,7 +97,8 @@ export default function App() {
                 <AlbumList setCurrentScreen={setCurrentScreen}
                     musicFiles={musicFiles} setMusicFiles={setMusicFiles}
                     albumArray={albumArray} setAlbumArray={setAlbumArray}
-                    TrackPlayer={TrackPlayer} />
+                    TrackPlayer={TrackPlayer} đ
+                    setState={setState} />
 
             </View>
         );

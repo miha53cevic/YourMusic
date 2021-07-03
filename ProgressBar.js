@@ -1,10 +1,9 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import Slider from '@react-native-community/slider';
 
-import { useTrackPlayerProgress } from 'react-native-track-player'
+import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player'
 
 function toInt(number) {
     return Number.parseInt((number).toString());
@@ -32,6 +31,12 @@ export default function ProgressBar() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+    function sliderSeek(value) {
+        TrackPlayer.seekTo(value);
+    }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>{cur_time}</Text>
@@ -43,6 +48,7 @@ export default function ProgressBar() {
             maximumTrackTintColor="#000000"
             thumbTintColor="#FFFFFFFF"
             value={progress.position}
+            onValueChange={value => sliderSeek(value)}
             />
             <Text style={styles.text}>{dur_time}</Text>
         </View>
