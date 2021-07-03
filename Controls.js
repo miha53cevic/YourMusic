@@ -3,6 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import TrackPlayer from 'react-native-track-player';
+
 import States from './States';
 
 
@@ -23,13 +26,13 @@ export default function Controls(props) {
     };
 
     const onClickForward = async() => {
-        props.TrackPlayer.skipToNext()
+        await TrackPlayer.skipToNext()
         .then(_ => console.log("Skipped forward"))
         .catch(error => console.error(error));
     }
 
     const onClickBackward = async() => {
-        await props.TrackPlayer.skipToPrevious()
+        await TrackPlayer.skipToPrevious()
         .then(_ => console.log("Skipped backward"))
         .catch(error => console.error(error));
     }
@@ -57,6 +60,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         display: 'flex',
         flexDirection: 'column',
+        paddingBottom: 16,
     },
 
     mediaControls: {
