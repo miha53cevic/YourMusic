@@ -94,7 +94,7 @@ export default function App() {
     const shuffleTracks = async(shuffle) => {
         await TrackPlayer.reset();
 
-        let tracksArray = musicFiles.get(curAlbum);
+        let tracksArray = [...musicFiles.get(curAlbum)];
         if (shuffle) {
             tracksArray = tracksArray.sort((a, b) => 0.5 - Math.random());
         }
