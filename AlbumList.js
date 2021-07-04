@@ -107,6 +107,8 @@ export default function AlbumList(props) {
         // Send back to main screen
         props.setCurrentScreen(Screens.HOME);
 
+        // Set current album, used for shuffling later
+        props.setCurAlbum(album);
         console.log(`playAlbum() called with album: ${album}`)
     }
 

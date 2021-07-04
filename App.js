@@ -19,6 +19,9 @@ export default function App() {
     const [musicFiles, setMusicFiles] = useState(null);
     const [albumArray, setAlbumArray] = useState([]);
     const [trackTitle, setTrackTitle] = useState("");
+    const [repeat, setRepeat] = useState(false);
+    const [shuffle, setShuffle] = useState(false);
+    const [curAlbum, setCurAlbum] = useState("");
 
     // Initialize TrackPlayer
     useEffect(async () => {
@@ -69,6 +72,14 @@ export default function App() {
             const track = await TrackPlayer.getTrack(event.nextTrack);
             const { title, artist, artwork } = track || { title: "No song Selected" };
             setTrackTitle(title);
+
+            // Repeat song TODO
+            if (repeat && curAlbum != "" && !skipped) {
+                TrackPlayer.skipToPrevious()
+                    .then(_ => console.log("repeating song"))
+                    .catch(error => error);
+            }
+
         }
     });
 
@@ -85,7 +96,9 @@ export default function App() {
 
                 <ProgressBar />
 
-                <Controls state={state} setState={setState} />
+                <Controls state={state} setState={setState}
+                            repeat={repeat} setRepeat={setRepeat} 
+                            shuffle={shuffle} setShuffle={setShuffle} />
                 
             </View>
         );
@@ -98,7 +111,8 @@ export default function App() {
                     musicFiles={musicFiles} setMusicFiles={setMusicFiles}
                     albumArray={albumArray} setAlbumArray={setAlbumArray}
                     TrackPlayer={TrackPlayer} đ
-                    setState={setState} />
+                    setState={setState} 
+                    setCurAlbum={setCurAlbum} />
 
             </View>
         );
