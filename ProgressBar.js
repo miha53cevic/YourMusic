@@ -31,8 +31,10 @@ export default function ProgressBar() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-    function sliderSeek(value) {
-        TrackPlayer.seekTo(value);
+    const sliderSeek = (value) => {
+        TrackPlayer.seekTo(value)
+            .then(_ => {})
+            .catch(error => console.error(error));
     }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

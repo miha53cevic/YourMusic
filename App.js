@@ -44,7 +44,7 @@ export default function App() {
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     // Reset Player
-    function resetPlayer() {
+    const resetPlayer = () => {
         TrackPlayer.reset()
             .then(_ => console.log("Reset Player"))
             .catch(error => console.error(error));
