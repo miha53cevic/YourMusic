@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight } from 'react-native';
+import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight, TextInput } from 'react-native';
 
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -15,10 +15,11 @@ export default function AlbumList(props) {
     // Note for future self
     // albumList can't be here because everytime we switch screens
     // we lose states from those components because they aren't initialized
+    const [searchText, setSearchText] = useState("");
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-    async function getMusicFiles() {
+    const getMusicFiles = async() => {
 
         // Find every song that is a .mp3
         let result = await MediaStore.readAudioVideoExternalMedias();
@@ -29,8 +30,6 @@ export default function AlbumList(props) {
         const musicMap = new Map();
         for (const track of result) {
             // example: content://Music/MyAlbum/track.mp3
-            const path = track.contentUri;
-
             const subfolder = track.album;
             if (!musicMap.has(subfolder)) {
                 musicMap.set(subfolder, []);
@@ -45,6 +44,10 @@ export default function AlbumList(props) {
             };
             musicMap.get(subfolder).push(formatedTrack);
         }
+        // Create ALL entry
+        musicMap.set("All", Array.from(musicMap.values()).flat(1)); // flat is used because it returns [[song1],[song2,song3]] to flatten to just one array
+
+        // Log and add to musicFiles so we don't have to do this search again
         console.log(musicMap);
         props.setMusicFiles(musicMap);
 
@@ -53,13 +56,17 @@ export default function AlbumList(props) {
         const iterator = musicMap.keys();
         let album = iterator.next().value;
         while (album != undefined) {
-            tempAlbum.push(album);
+            if (album == "All") { // set album "All" to be on top
+                tempAlbum.unshift(album); // push to the front of the array
+            } else {
+                tempAlbum.push(album); // push to the back of the array
+            }
             album = iterator.next().value;
         }
         props.setAlbumArray(tempAlbum);
     }
 
-    async function requestFilePermission() {
+    const requestFilePermission = async() => {
         try {
             const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -90,7 +97,7 @@ export default function AlbumList(props) {
     }
 
     // On flatlist item press    
-    async function playAlbum(album) {
+    const playAlbum = async(album) => {
         // add songs to trackplayer
         TrackPlayer.add(props.musicFiles.get(album));
 
@@ -103,7 +110,12 @@ export default function AlbumList(props) {
         console.log(`playAlbum() called with album: ${album}`)
     }
 
+    const onSearchTextChange = (text) => {
+        setSearchText(text);
+    };
+
 /////////////////////////////////////////////////////////////////////////////////////////////
+    const albums = props.albumArray.filter(album => album.toLowerCase().includes(searchText));
 
     // Render components
     return (
@@ -119,9 +131,12 @@ export default function AlbumList(props) {
                     <IconAntDesign name="back" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.HOME)} />
                 </View>
             </View>
+            <View style={styles.searchBarDiv}>
+                <TextInput style={styles.searchBar} placeholder={"Search"} onChangeText={text => onSearchTextChange(text)}></TextInput>
+            </View>
             <FlatList style={styles.flatlist}
                 keyExtractor = {(item) => item.toString()}
-                data = {props.albumArray}
+                data = {albums}
                 renderItem={({item}) =>
                 <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD" onPress={() => playAlbum(item)} >
                     <View style={styles.backgroundDiv} >
@@ -157,6 +172,18 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignSelf: 'center',
         fontSize: 24,
+    },
+
+    searchBarDiv: {
+        width: "80%",
+        borderBottomColor: 'black',
+        borderBottomWidth: 1
+    },
+
+    searchBar: {
+        fontSize: 32,
+        alignSelf: 'center',
+        textDecorationLine: 'none',
     },
 
     backgroundDiv: {
