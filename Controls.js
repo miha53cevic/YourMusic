@@ -24,7 +24,7 @@ export default function Controls(props) {
             props.setState(States.PAUSED);
         }
     };
-
+    
     const onClickForward = async() => {
         await TrackPlayer.skipToNext()
         .then(_ => console.log("Skipped forward"))
