@@ -11,7 +11,7 @@ import Screens from './Screens';
 import States from './States';
 import ProgressBar from './ProgressBar';
 
-import TrackPlayer, { useTrackPlayerEvents, useTrackPlayerProgress } from 'react-native-track-player';
+import TrackPlayer, { reset, useTrackPlayerEvents, useTrackPlayerProgress } from 'react-native-track-player';
 
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
@@ -22,6 +22,7 @@ export default function App() {
     const [repeat, setRepeat] = useState(false);
     const [shuffle, setShuffle] = useState(false);
     const [curAlbum, setCurAlbum] = useState("");
+    const [loopTrack, setLoopTrack] = useState("");
 
     // Initialize TrackPlayer
     useEffect(async () => {
@@ -47,7 +48,7 @@ export default function App() {
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     // Reset Player
-    const resetPlayer = () => {
+    const resetPlayer = async() => {
         TrackPlayer.reset()
             .then(_ => console.log("Reset Player"))
             .catch(error => console.error(error));
@@ -69,19 +70,37 @@ export default function App() {
     // Update title
     useTrackPlayerEvents(["playback-track-changed"], async event => {
         if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
-            const track = await TrackPlayer.getTrack(event.nextTrack);
-            const { title, artist, artwork } = track || { title: "No song Selected" };
+            const nextTrack = await TrackPlayer.getTrack(event.nextTrack);
+            const { title, artist, artwork } = nextTrack || {title: "No song selected"};
             setTrackTitle(title);
 
-            // Repeat song TODO
-            if (repeat && curAlbum != "" && !skipped) {
-                TrackPlayer.skipToPrevious()
-                    .then(_ => console.log("repeating song"))
-                    .catch(error => error);
-            }
-
+            // If repeat is on loop the track by checking current and skipping back till we hit the one we need
+            // shitty hacky way because trackplayer doesn't have repeat option :(
+            checkAndLoopTrack();
         }
     });
+
+    const checkAndLoopTrack = async() => {
+        if (repeat && albumArray != "") {
+            const currentTrack = await TrackPlayer.getCurrentTrack();
+            if (currentTrack != loopTrack) {
+                TrackPlayer.skipToPrevious()
+                    .then(_ => {})
+                    .catch(error => console.log(error));
+            }
+        }
+    };
+
+    const shuffleTracks = async(shuffle) => {
+        await TrackPlayer.reset();
+
+        let tracksArray = musicFiles.get(curAlbum);
+        if (shuffle) {
+            tracksArray = tracksArray.sort((a, b) => 0.5 - Math.random());
+        }
+        await TrackPlayer.add(tracksArray);
+        console.log("Shuffling array");
+    };
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -98,7 +117,9 @@ export default function App() {
 
                 <Controls state={state} setState={setState}
                             repeat={repeat} setRepeat={setRepeat} 
-                            shuffle={shuffle} setShuffle={setShuffle} />
+                            shuffle={shuffle} setShuffle={setShuffle} 
+                            setLoopTrack={setLoopTrack} 
+                            shuffleTracks={shuffleTracks} />
                 
             </View>
         );

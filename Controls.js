@@ -28,34 +28,50 @@ export default function Controls(props) {
     };
     
     const onClickForward = async() => {
+        // Disable skip if repeat is on
+        if (props.repeat) return;
+
         await TrackPlayer.skipToNext()
         .then(_ => console.log("Skipped forward"))
         .catch(error => console.error(error));
     }
 
     const onClickBackward = async() => {
+        // Disable skip if repeat is on
+        if (props.repeat) return;
+
         await TrackPlayer.skipToPrevious()
         .then(_ => console.log("Skipped backward"))
         .catch(error => console.error(error));
     }
 
-    const onClickRepeat = () => {
+    const onClickRepeat = async() => {
         if (props.repeat) {
             setRepeatColour('white');
             props.setRepeat(false);
+
+            props.setLoopTrack("");
         } else if (!props.repeat) {
             setRepeatColour('grey');
             props.setRepeat(true);
+
+            // Remember the track we are looping (fix this when new update for trackPlayer comes)
+            // This is a shitty hacky workaround for not having a bloody repeat option in TrackPlayer
+            props.setLoopTrack(await TrackPlayer.getCurrentTrack());
         }
     };
 
-    const onClickShuffle = () => {
+    const onClickShuffle = async() => {
         if (props.shuffle) {
             setShuffleColour('white');
             props.setShuffle(false);
+
+            props.shuffleTracks(false);
         } else if (!props.shuffle) {
             setShuffleColour('grey');
             props.setShuffle(true);
+
+            props.shuffleTracks(true);
         }
     };
 
