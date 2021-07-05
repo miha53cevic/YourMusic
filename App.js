@@ -55,6 +55,7 @@ export default function App() {
             .catch(error => console.error(error));
 
         setState(States.PAUSED);
+        setCurAlbum("");
     }
 
     // Play / Pause
