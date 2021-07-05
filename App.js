@@ -6,10 +6,11 @@ import { StatusBar } from 'react-native';
 import Title from './Title';
 import Controls from './Controls';
 import AlbumList from './AlbumList';
+import ProgressBar from './ProgressBar';
+import SongList from './SongList';
 
 import Screens from './Screens';
 import States from './States';
-import ProgressBar from './ProgressBar';
 
 import TrackPlayer, { reset, useTrackPlayerEvents, useTrackPlayerProgress } from 'react-native-track-player';
 
@@ -74,7 +75,7 @@ export default function App() {
             const { title, artist, artwork } = nextTrack || {title: "No song selected"};
             setTrackTitle(title);
 
-            // If repeat is on loop the track by checking current and skipping back till we hit the one we need
+            // If repeat is on loop the track by checking current and skip to that track
             // shitty hacky way because trackplayer doesn't have repeat option :(
             checkAndLoopTrack();
         }
@@ -84,8 +85,8 @@ export default function App() {
         if (repeat && albumArray != "") {
             const currentTrack = await TrackPlayer.getCurrentTrack();
             if (currentTrack != loopTrack) {
-                TrackPlayer.skipToPrevious()
-                    .then(_ => {})
+                TrackPlayer.skip(loopTrack)
+                    .then(_ => console.log(`Repeating track: ${musicFiles.get(curAlbum).filter(t => t.id == loopTrack)[0].title}`))
                     .catch(error => console.log(error));
             }
         }
@@ -121,6 +122,8 @@ export default function App() {
                             setLoopTrack={setLoopTrack} 
                             shuffleTracks={shuffleTracks} />
                 
+                <SongList tracks={musicFiles != null ? musicFiles.get(curAlbum) : []} 
+                            repeat={repeat} />
             </View>
         );
     } else if (currentScreen == Screens.OPTIONS) {
@@ -131,7 +134,6 @@ export default function App() {
                 <AlbumList setCurrentScreen={setCurrentScreen}
                     musicFiles={musicFiles} setMusicFiles={setMusicFiles}
                     albumArray={albumArray} setAlbumArray={setAlbumArray}
-                    TrackPlayer={TrackPlayer} đ
                     setState={setState} 
                     setCurAlbum={setCurAlbum} />
 

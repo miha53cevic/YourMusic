@@ -31,6 +31,7 @@ export default function Controls(props) {
         // Disable skip if repeat is on
         if (props.repeat) return;
 
+
         await TrackPlayer.skipToNext()
         .then(_ => console.log("Skipped forward"))
         .catch(error => console.error(error));
