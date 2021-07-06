@@ -1,16 +1,16 @@
 # YourMusic - Android App using ReactNative
 
-## YourMusic is an app that aims to allow users to play local songs and easily create playlists by just dropping songs into folders
+YourMusic is an app that aims to allow users to play local songs and easily create playlists by just dropping songs into folders
 
-# Screenshots
+## Screenshots
 ![](screenshots/img1.png)
 ![](screenshots/img2.png)
 ![](screenshots/img3.png)
 
-# Creating playlists
-## Just drag and drop your songs into a new folder, for example myplaylist
-## The file structure would then look like
-## root
+## Creating playlists
+Just drag and drop your songs into a new folder, for example myplaylist
+The file structure would then look like
+root
  - Music
     - myplaylist
         - song1
@@ -21,4 +21,4 @@
  - Videos 
  - Android
 
- ## Music can be placed anywhere in your android filesystem, the only requirement are that the songs are .mp3 format!!!
+Music can be placed anywhere in your android filesystem, the only requirement are that the songs are .mp3 format!!!
