@@ -9,10 +9,15 @@ export default function Title(props) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-    async function switchOptions() {
+    const switchAlbums = async() => {
         await props.resetPlayer();
-        props.setCurrentScreen(Screens.OPTIONS)
-    }
+        props.setCurrentScreen(Screens.ALBUMS)
+    };
+
+    const switchYTSearch = async() => {
+        await props.resetPlayer();
+        props.setCurrentScreen(Screens.YTSEARCH);
+    };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -21,13 +26,13 @@ export default function Title(props) {
     <>
         <View style={styles.topBarDiv}>
             <View style={styles.buttonDiv}>
-                <IconIonicons name="options" size={48} color="#FFFFFF00" />
+                <IconIonicons name="download-outline" size={48} color="white" onPress={() => switchYTSearch()} />
             </View>
             <Text style={styles.topBarText}>
                 Home
             </Text>
             <View style={styles.buttonDiv}>
-                <IconIonicons name="options" size={48} color="white" onPress={() => switchOptions()} />
+                <IconIonicons name="options-outline" size={48} color="white" onPress={() => switchAlbums()} />
             </View>
         </View>
         <View style={styles.titleDiv}>

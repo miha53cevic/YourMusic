@@ -8,6 +8,7 @@ import Controls from './Controls';
 import AlbumList from './AlbumList';
 import ProgressBar from './ProgressBar';
 import SongList from './SongList';
+import YtSearch from './YtSearch';
 
 import Screens from './Screens';
 import States from './States';
@@ -127,7 +128,7 @@ export default function App() {
                             repeat={repeat} />
             </View>
         );
-    } else if (currentScreen == Screens.OPTIONS) {
+    } else if (currentScreen == Screens.ALBUMS) {
         return (
             <View style={styles.container}>
                 <StatusBar hidden={true} />
@@ -138,6 +139,14 @@ export default function App() {
                     setState={setState} 
                     setCurAlbum={setCurAlbum} />
 
+            </View>
+        );
+    } else if (currentScreen == Screens.YTSEARCH) {
+        return (
+            <View style={styles.container}>
+                <StatusBar hidden={true} />
+
+                <YtSearch setCurrentScreen={setCurrentScreen} />
             </View>
         );
     }

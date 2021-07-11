@@ -10,7 +10,6 @@ YourMusic is an app that aims to allow users to play local songs and easily crea
 ## Creating playlists
 Just drag and drop your songs into a new folder, for example myplaylist
 The file structure would then look like
-root
  - Music
     - myplaylist
         - song1

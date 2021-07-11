@@ -1,4 +1,5 @@
 export default Screens = {
     HOME: 'home',
-    OPTIONS: 'options'
+    ALBUMS: 'albums',
+    YTSEARCH: 'ytsearch',
 };
