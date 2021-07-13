@@ -4,6 +4,8 @@ import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighligh
 
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 
+import ytdl from 'react-native-ytdl';
+
 import Screens from './Screens';
 import { YT_API_KEY } from './API';
 
@@ -72,9 +74,15 @@ export default function YtSearch(props) {
         .catch(error => console.error(error));
     };
 
+    const download = async(url) => {
+        const youtubeURL = 'http://www.youtube.com/watch?v=04GiqLjRO3A';
+        const urls = await ytdl(youtubeURL, { quality: 'highestaudio' });
+        console.log(urls)
+    };
+
 /////////////////////////////////////////////////////////////////////////////////////////////
     
-// Render components
+    // Render components
     return (
         <>
             <View style={styles.topBarDiv}>
@@ -95,7 +103,7 @@ export default function YtSearch(props) {
                 keyExtractor = {(item) => item.id}
                 data = {searchResults}
                 renderItem={({item}) =>
-                <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD" onPress={() => {}} >
+                <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD" onPress={() => download(item.url)} >
                     <View style={styles.backgroundDiv} >
                         <Image source={{ uri: item.thumbnail }} style={styles.listItemImage} />
                         <Text style={styles.listItem}> {item.title} </Text>
