@@ -16,10 +16,9 @@ export default function YtSearch(props) {
     const [searchText, setSearchText] = useState("");
     const [searchResults, setSearchResults] = useState([]);
 
-    const ytSortBy = "title";
     const ytType = "video";
     const ytMaxRecords = 5;
-    const yt_request = `https://youtube.googleapis.com/youtube/v3/search?&part=snippet&order=${ytSortBy}&type=${ytType}&key=${YT_API_KEY}&maxResults=${ytMaxRecords}&q=`;
+    const yt_request = `https://youtube.googleapis.com/youtube/v3/search?&part=snippet&type=${ytType}&key=${YT_API_KEY}&maxResults=${ytMaxRecords}&q=`;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +75,8 @@ export default function YtSearch(props) {
 
     const download = async(url) => {
         const youtubeURL = 'http://www.youtube.com/watch?v=04GiqLjRO3A';
-        const urls = await ytdl(youtubeURL, { quality: 'highestaudio' });
+        console.log(ytdl.validateURL(url));
+        const urls = ytdl.getInfo(youtubeURL).then(ele => console.log(ele)).catch(err => console.error(err));
         console.log(urls)
     };
 
