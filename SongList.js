@@ -7,15 +7,15 @@ import TrackPlayer from 'react-native-track-player';
 
 export default function SongList(props) {
     const [arrow, setArrow] = useState("up");
-    const [height, setHeight] = useState("auto"); 
+    const [displayList, setDisplayList] = useState("none"); 
 
     const openCloseList = () => {
         if (arrow == 'up') {
             setArrow('down');
-            setHeight('50%');
+            setDisplayList('flex');
         } else if (arrow == 'down') {
             setArrow('up');
-            setHeight('auto');
+            setDisplayList('none');
         }
     };
 
@@ -39,7 +39,6 @@ export default function SongList(props) {
             backgroundColor: 'black',
             display: 'flex',
             flexDirection: 'column',
-            height: height
         },
 
         arrow: {
@@ -50,7 +49,8 @@ export default function SongList(props) {
             display: 'flex',
             width: '100%',
             paddingTop: 32,
-            height: 0,
+            height: '40%',
+            display: displayList,
         }, 
 
         listItem: {
@@ -75,6 +75,7 @@ export default function SongList(props) {
         <View style={styles.container}>
             <IconAntDesign style={styles.arrow} name={arrow} size={48} color='white' onPress={() => openCloseList()} />
             <FlatList style={styles.flatlist}
+                contentContainerStyle={{paddingBottom: 32}}
                 keyExtractor = {(item) => item.id}
                 data = {props.tracks}
                 renderItem={({item}) =>
