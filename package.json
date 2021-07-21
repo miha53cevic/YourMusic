@@ -1,10 +1,11 @@
 {
   "name": "yourmusic",
-  "version": "1.2.0",
+  "version": "1.1.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "start": "react-native start",
+    "react-native-version": "npx react-native-version --never-amend",
     "test": "jest",
     "lint": "eslint ."
   },
@@ -14,8 +15,7 @@
     "react-native": "0.64.2",
     "react-native-mediastore": "0.1.0",
     "react-native-track-player": "^1.2.7",
-    "react-native-vector-icons": "^8.1.0",
-    "react-native-ytdl": "^4.8.3"
+    "react-native-vector-icons": "^8.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

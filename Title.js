@@ -14,11 +14,6 @@ export default function Title(props) {
         props.setCurrentScreen(Screens.ALBUMS)
     };
 
-    const switchYTSearch = async() => {
-        await props.resetPlayer();
-        props.setCurrentScreen(Screens.YTSEARCH);
-    };
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 
     // Render components
@@ -26,7 +21,7 @@ export default function Title(props) {
     <>
         <View style={styles.topBarDiv}>
             <View style={styles.buttonDiv}>
-                <IconIonicons name="download-outline" size={48} color="white" onPress={() => switchYTSearch()} />
+                <IconIonicons name="download-outline" size={48} color="#00000000" />
             </View>
             <Text style={styles.topBarText}>
                 Home
