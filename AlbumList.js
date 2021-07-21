@@ -44,6 +44,13 @@ export default function AlbumList(props) {
             };
             musicMap.get(subfolder).push(formatedTrack);
         }
+        
+        // If empty set empty map
+        if (!musicMap.size) {
+            props.setMusicFiles(new Map());
+            return;
+        }
+
         // Create ALL entry
         musicMap.set("All", Array.from(musicMap.values()).flat(1)); // flat is used because it returns [[song1],[song2,song3]] to flatten to just one array
 
