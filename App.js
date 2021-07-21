@@ -13,7 +13,7 @@ import YtSearch from './YtSearch';
 import Screens from './Screens';
 import States from './States';
 
-import TrackPlayer, { reset, useTrackPlayerEvents, useTrackPlayerProgress } from 'react-native-track-player';
+import TrackPlayer, { useTrackPlayerEvents } from 'react-native-track-player';
 
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
