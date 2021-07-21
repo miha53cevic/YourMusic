@@ -94,6 +94,9 @@ export default function App() {
     };
 
     const shuffleTracks = async(shuffle) => {
+        // If no album is selected don't try to shuffle
+        if (curAlbum == "") return;
+
         await TrackPlayer.reset();
 
         let tracksArray = [...musicFiles.get(curAlbum)];
