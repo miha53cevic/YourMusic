@@ -23,7 +23,7 @@ export default function AlbumList(props) {
 
         // Find every song that is a .mp3
         let result = await MediaStore.readAudioVideoExternalMedias();
-        result = result.filter(r => r.name.endsWith(".mp3")); // instead of this maybe mime starts with "audio/"
+        result = result.filter(r => r.mime.startsWith("audio/")); // instead of this maybe mime starts with "audio/"
         console.log(`Found ${result.length} songs!`);
 
         // Create map with all subfolders containing the songs
