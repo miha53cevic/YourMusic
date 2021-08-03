@@ -6,9 +6,9 @@ import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import TrackPlayer from 'react-native-track-player';
+import { IconButton } from 'react-native-paper';
 
 import States from './States';
-
 
 export default function Controls(props) {
     const [playPause, setPlayPause] = useState(props.state == States.PAUSED ? 'play-circle' : 'pause-circle');
@@ -82,11 +82,11 @@ export default function Controls(props) {
     return (
         <View style={styles.controlDiv}>
             <View style={styles.mediaControls}>
-                <IconEntypo style={styles.repeControl} name="loop" size={48} color={repeatColour} onPress={() => onClickRepeat()} />
-                <IconEntypo style={styles.backControl} name="controller-jump-to-start" size={48} color="white" onPress={() => onClickBackward()} />
-                <IconFontAwesome onPress={() => onClickPlayPause()} style={styles.playPause} name={playPause} size={96} color="white" />
-                <IconEntypo style={styles.forwControl} name="controller-next" size={48} color="white" onPress={() => onClickForward()} />
-                <IconEntypo style={styles.loopControl} name="shuffle" size={48} color={shuffleColour} onPress={() => onClickShuffle()} />
+                <IconButton style={styles.repeControl} icon="replay" size={48} color={repeatColour} onPress={() => onClickRepeat()} />
+                <IconButton style={styles.backControl} icon="skip-previous" size={48} color="white" onPress={() => onClickBackward()} />
+                <IconButton onPress={() => onClickPlayPause()} style={styles.playPause} icon={playPause} size={96} color="white" />
+                <IconButton style={styles.forwControl} icon="skip-next" size={48} color="white" onPress={() => onClickForward()} />
+                <IconButton style={styles.loopControl} icon="shuffle" size={48} color={shuffleColour} onPress={() => onClickShuffle()} />
             </View>
         </View>
     );
@@ -98,7 +98,7 @@ export default function Controls(props) {
 const styles = StyleSheet.create({
     controlDiv: {
         width: '100%',
-        backgroundColor: 'black',
+        backgroundColor: '#272727',
         display: 'flex',
         flexDirection: 'column',
         paddingBottom: 16,
@@ -121,16 +121,15 @@ const styles = StyleSheet.create({
     repeControl: {
         alignSelf: 'center',
         marginRight: 'auto',
-        marginLeft: 16,
     },
 
     loopControl: {
         alignSelf: 'center',
         marginLeft: 'auto',
-        marginRight: 16,
     },
 
     playPause: {
-        marginHorizontal: 16,
+        width: 96,
+        height: 96,
     },
 });

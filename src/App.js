@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'react-native';
 
-import Title from './Title';
+import SongTitle from './SongTitle';
 import Controls from './Controls';
 import AlbumList from './AlbumList';
 import ProgressBar from './ProgressBar';
@@ -13,6 +13,7 @@ import Screens from './Screens';
 import States from './States';
 
 import TrackPlayer, { useTrackPlayerEvents } from 'react-native-track-player';
+import { useTheme } from 'react-native-paper';
 
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
@@ -108,14 +109,15 @@ export default function App() {
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////////
+    const themeBackgroundColour = useTheme().colors.background;
 
     // Render components
     if (currentScreen == Screens.HOME) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
                 <StatusBar hidden={true} />
 
-                <Title setCurrentScreen={setCurrentScreen} resetPlayer={resetPlayer}
+                <SongTitle setCurrentScreen={setCurrentScreen} resetPlayer={resetPlayer}
                     trackTitle={trackTitle} />
 
                 <ProgressBar />
@@ -132,7 +134,7 @@ export default function App() {
         );
     } else if (currentScreen == Screens.ALBUMS) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
                 <StatusBar hidden={true} />
 
                 <AlbumList setCurrentScreen={setCurrentScreen}
@@ -153,7 +155,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         flex: 1,
-        backgroundColor: 'grey',
         alignItems: 'center',
         justifyContent: 'center',
     },
