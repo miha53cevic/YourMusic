@@ -2,9 +2,6 @@ import React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import IconEntypo from 'react-native-vector-icons/Entypo';
-import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
-
 import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
 
