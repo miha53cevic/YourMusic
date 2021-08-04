@@ -74,7 +74,7 @@ export default function App() {
     useTrackPlayerEvents(["playback-track-changed"], async event => {
         if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
             const nextTrack = await TrackPlayer.getTrack(event.nextTrack);
-            const { title, artist, artwork } = nextTrack || {title: "No song selected"};
+            const { title } = nextTrack || { title: "No song selected" };
             setTrackTitle(title);
 
             // If repeat is on loop the track by checking current and skip to that track
