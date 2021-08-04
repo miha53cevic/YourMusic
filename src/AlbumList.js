@@ -122,7 +122,7 @@ export default function AlbumList(props) {
     };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-    const albums = props.albumArray.filter(album => album.toLowerCase().includes(searchText));
+    const albums = props.albumArray.filter(album => album.toLowerCase().includes(searchText.toLowerCase()));
 
     // Render components
     return (
