@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'react-native';
 
-import Title from './Title';
+import SongTitle from './SongTitle';
 import Controls from './Controls';
 import AlbumList from './AlbumList';
 import ProgressBar from './ProgressBar';
@@ -14,6 +14,7 @@ import Screens from './Screens';
 import States from './States';
 
 import TrackPlayer, { useTrackPlayerEvents } from 'react-native-track-player';
+import { useTheme } from 'react-native-paper';
 
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
@@ -74,7 +75,7 @@ export default function App() {
     useTrackPlayerEvents(["playback-track-changed"], async event => {
         if (event.type === TrackPlayer.TrackPlayerEvents.PLAYBACK_TRACK_CHANGED) {
             const nextTrack = await TrackPlayer.getTrack(event.nextTrack);
-            const { title, artist, artwork } = nextTrack || {title: "No song selected"};
+            const { title } = nextTrack || { title: "No song selected" };
             setTrackTitle(title);
 
             // If repeat is on loop the track by checking current and skip to that track
@@ -95,6 +96,9 @@ export default function App() {
     };
 
     const shuffleTracks = async(shuffle) => {
+        // If no album is selected don't try to shuffle
+        if (curAlbum == "") return;
+
         await TrackPlayer.reset();
 
         let tracksArray = [...musicFiles.get(curAlbum)];
@@ -106,14 +110,15 @@ export default function App() {
     };
 
     /////////////////////////////////////////////////////////////////////////////////////////////
+    const themeBackgroundColour = useTheme().colors.background;
 
     // Render components
     if (currentScreen == Screens.HOME) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
                 <StatusBar hidden={true} />
 
-                <Title setCurrentScreen={setCurrentScreen} resetPlayer={resetPlayer}
+                <SongTitle setCurrentScreen={setCurrentScreen} resetPlayer={resetPlayer}
                     trackTitle={trackTitle} />
 
                 <ProgressBar />
@@ -130,7 +135,7 @@ export default function App() {
         );
     } else if (currentScreen == Screens.ALBUMS) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
                 <StatusBar hidden={true} />
 
                 <AlbumList setCurrentScreen={setCurrentScreen}
@@ -143,7 +148,7 @@ export default function App() {
         );
     } else if (currentScreen == Screens.YTSEARCH) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
                 <StatusBar hidden={true} />
 
                 <YtSearch setCurrentScreen={setCurrentScreen} />
@@ -159,7 +164,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         flex: 1,
-        backgroundColor: 'grey',
         alignItems: 'center',
         justifyContent: 'center',
     },

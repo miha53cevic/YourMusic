@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: 'black',
         width: '100%',
+        backgroundColor: '#272727',
     },
 
     slider: {
@@ -75,6 +76,6 @@ const styles = StyleSheet.create({
     text: {
         color: 'white',
         fontStyle: 'italic',
-        backgroundColor: 'black',
+        backgroundColor: '#272727',
     }
 });

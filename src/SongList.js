@@ -1,20 +1,19 @@
 import React, {useState} from 'react';
 import { StyleSheet, View, FlatList, TouchableHighlight, Text } from 'react-native';
 
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
-
 import TrackPlayer from 'react-native-track-player';
+import { IconButton } from 'react-native-paper';
 
 export default function SongList(props) {
-    const [arrow, setArrow] = useState("up");
+    const [arrow, setArrow] = useState("chevron-up");
     const [displayList, setDisplayList] = useState("none"); 
 
     const openCloseList = () => {
-        if (arrow == 'up') {
-            setArrow('down');
+        if (arrow == 'chevron-up') {
+            setArrow('chevron-down');
             setDisplayList('flex');
-        } else if (arrow == 'down') {
-            setArrow('up');
+        } else if (arrow == 'chevron-down') {
+            setArrow('chevron-up');
             setDisplayList('none');
         }
     };
@@ -36,7 +35,7 @@ export default function SongList(props) {
     const styles = StyleSheet.create({
         container: {
             width: '100%',
-            backgroundColor: 'black',
+            backgroundColor: '#272727',
             display: 'flex',
             flexDirection: 'column',
         },
@@ -48,7 +47,6 @@ export default function SongList(props) {
         flatlist: {
             display: 'flex',
             width: '100%',
-            paddingTop: 32,
             height: '40%',
             display: displayList,
         }, 
@@ -73,7 +71,7 @@ export default function SongList(props) {
 
     return (
         <View style={styles.container}>
-            <IconAntDesign style={styles.arrow} name={arrow} size={48} color='white' onPress={() => openCloseList()} />
+            <IconButton style={styles.arrow} icon={arrow} size={48} color='white' onPress={() => openCloseList()} />
             <FlatList style={styles.flatlist}
                 contentContainerStyle={{paddingBottom: 32}}
                 keyExtractor = {(item) => item.id}

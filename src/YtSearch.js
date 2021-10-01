@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight, TextInput, Image } from 'react-native';
-
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight, Image } from 'react-native';
 
 import ytdl from 'react-native-ytdl';
 import RNFS from 'react-native-fs';
 
 import Screens from './Screens';
 import { YT_API_KEY } from './API';
+
+import { Appbar, TextInput } from 'react-native-paper';
 
 export default function YtSearch(props) {
     // Note for future self
@@ -17,6 +17,7 @@ export default function YtSearch(props) {
     const [searchText, setSearchText] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [isDownloading, setDownloading] = useState(false);
+    const [downloadingStatusText, setDownloadingStatusText] = useState("Downloading...");
 
     const ytType = "video";
     const ytMaxRecords = 5;
@@ -25,28 +26,58 @@ export default function YtSearch(props) {
 /////////////////////////////////////////////////////////////////////////////////////////////
 
     const requestFilePermission = async(url, title) => {
-        try {
-            const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-            {
-                title: "YourMusic needs Permission",
-                message: "For the app to work properly read permissions are needed",
-                buttonNeutral: "Ask Me Later",
-                buttonNegative: "Cancel",
-                buttonPositive: "OK"
+
+        const read_permissions = async() => {
+            try {
+                const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                {
+                    title: "YourMusic needs Permission",
+                    message: "For the app to work properly read permissions are needed",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK"
+                }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("You can read files");
+                    write_permissions();
+                } else {
+                    console.log("File permission denied");
+                    // Ask for permission again
+                    requestFilePermission(url, title);
+                }
+            } catch (err) {
+                console.warn(err);
             }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log("You can use files");
-                download_and_save(url, title);
-            } else {
-                console.log("File permission denied");
-                // Ask for permission again
-                requestFilePermission();
+        };
+
+        const write_permissions = async() => {
+            try {
+                const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                {
+                    title: "YourMusic needs Permission",
+                    message: "For the app to work properly write permissions are needed",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK"
+                }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("You can write files");
+                    download_and_save(url, title);
+                } else {
+                    console.log("File permission denied");
+                    // Ask for permission again
+                    requestFilePermission(url, title);
+                }
+            } catch (err) {
+                console.warn(err);
             }
-        } catch (err) {
-            console.warn(err);
-        }
+        };
+
+        read_permissions();
     };
 
     const onSearchTextChange = (text) => {
@@ -92,9 +123,14 @@ export default function YtSearch(props) {
         })
         .promise.then(res => {
             console.log(res);
-            setDownloading(false);
+            if (res.statusCode == 200) {
+                setDownloadingStatusText("Downloaded successfuly");
+            } else setDownloadingStatusText(`Status code ${res.statusCode}`); 
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            setDownloadingStatusText("An error has occured");
+        });
     };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,36 +139,24 @@ export default function YtSearch(props) {
     if (isDownloading) {
         return (
             <>
-                <View style={styles.topBarDiv}>
-                    <View style={styles.buttonDiv}>
-                        <IconAntDesign name="back" size={48} color="#FFFFFF00" />
-                    </View>
-                    <Text style={styles.topBarText}>
-                        Download a song
-                    </Text>
-                    <View style={styles.buttonDiv}>
-                        <IconAntDesign name="back" size={48} color="#FFFFFF00" />
-                    </View>
-                </View>
+                <Appbar.Header style={{width: '100%'}}>
+                    <Appbar.Action />
+                    <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Download song" />
+                    <Appbar.Action icon="keyboard-return" onPress={() => props.setCurrentScreen(Screens.HOME)} />
+                </Appbar.Header>
                 <View style={styles.container}>
-                    <Text style={styles.downloadingText}>Downloading...</Text>
+                    <Text style={styles.downloadingText}>{downloadingStatusText}</Text>
                 </View>
             </>
         );
     }
     else return (
         <>
-            <View style={styles.topBarDiv}>
-                <View style={styles.buttonDiv}>
-                    <IconAntDesign name="back" size={48} color="#FFFFFF00" />
-                </View>
-                <Text style={styles.topBarText}>
-                    Download a song
-                </Text>
-                <View style={styles.buttonDiv}>
-                    <IconAntDesign name="back" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.HOME)} />
-                </View>
-            </View>
+            <Appbar.Header style={{width: '100%'}}>
+                <Appbar.Action />
+                <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Download song" />
+                <Appbar.Action icon="keyboard-return" onPress={() => props.setCurrentScreen(Screens.HOME)} />
+            </Appbar.Header>
             <View style={styles.searchBarDiv}>
                 <TextInput style={styles.searchBar} placeholder={"Search"} onChangeText={text => onSearchTextChange(text)} onSubmitEditing={() => search()}></TextInput>
             </View>
@@ -159,7 +183,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         flex: 1,
-        backgroundColor: 'grey',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -175,32 +198,13 @@ const styles = StyleSheet.create({
         padding: 8,
     },
 
-    topBarDiv: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        backgroundColor: '#212121',
-        width: '100%',
-        backgroundColor: 'black',
-    },
-
-    topBarText: {
-        color: 'white',
-        textAlign: 'center',
-        alignSelf: 'center',
-        fontSize: 24,
-    },
-
     searchBarDiv: {
         width: "80%",
-        borderBottomColor: 'black',
-        borderBottomWidth: 1
+        marginTop: 16,
     },
 
     searchBar: {
         fontSize: 32,
-        alignSelf: 'center',
-        textDecorationLine: 'none',
     },
 
     backgroundDiv: {
@@ -210,6 +214,11 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         flexDirection: 'row',
     },
+
+    flatlist: {
+        display: 'flex',
+        width: '100%',
+    }, 
 
     flatlist: {
         display: 'flex',

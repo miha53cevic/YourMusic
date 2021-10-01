@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight, TextInput } from 'react-native';
-
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
-import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
+import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight } from 'react-native';
 
 import MediaStore from 'react-native-mediastore';
 
@@ -10,6 +7,7 @@ import Screens from './Screens';
 import States from './States';
 
 import TrackPlayer from 'react-native-track-player';
+import { Appbar, TextInput } from 'react-native-paper';
 
 export default function AlbumList(props) {
     // Note for future self
@@ -23,7 +21,7 @@ export default function AlbumList(props) {
 
         // Find every song that is a .mp3
         let result = await MediaStore.readAudioVideoExternalMedias();
-        result = result.filter(r => r.name.endsWith(".mp3")); // instead of this maybe mime starts with "audio/"
+        result = result.filter(r => r.mime.startsWith("audio/")); // instead of this maybe mime starts with "audio/"
         console.log(`Found ${result.length} songs!`);
 
         // Create map with all subfolders containing the songs
@@ -124,24 +122,18 @@ export default function AlbumList(props) {
     };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-    const albums = props.albumArray.filter(album => album.toLowerCase().includes(searchText));
+    const albums = props.albumArray.filter(album => album.toLowerCase().includes(searchText.toLowerCase()));
 
     // Render components
     return (
         <>
-            <View style={styles.topBarDiv}>
-                <View style={styles.buttonDiv}>
-                    <IconFontAwesome name="refresh" size={48} color="white" onPress={() => requestFilePermission()} />
-                </View>
-                <Text style={styles.topBarText}>
-                    Choose song folder
-                </Text>
-                <View style={styles.buttonDiv}>
-                    <IconAntDesign name="back" size={48} color="white" onPress={() => props.setCurrentScreen(Screens.HOME)} />
-                </View>
-            </View>
+            <Appbar.Header style={{width: '100%'}}>
+                <Appbar.Action icon="refresh" onPress={() => requestFilePermission()} />
+                <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Choose song folder" />
+                <Appbar.Action icon="keyboard-return" onPress={() => props.setCurrentScreen(Screens.HOME)} />
+            </Appbar.Header>
             <View style={styles.searchBarDiv}>
-                <TextInput style={styles.searchBar} placeholder={"Search"} onChangeText={text => onSearchTextChange(text)}></TextInput>
+                <TextInput style={styles.searchBar} laceholder={"Search"} onChangeText={text => onSearchTextChange(text)}></TextInput>
             </View>
             <FlatList style={styles.flatlist}
                 keyExtractor = {(item) => item.toString()}
@@ -167,38 +159,19 @@ const styles = StyleSheet.create({
         padding: 8,
     },
 
-    topBarDiv: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        backgroundColor: '#212121',
-        width: '100%',
-        backgroundColor: 'black',
-    },
-
-    topBarText: {
-        color: 'white',
-        textAlign: 'center',
-        alignSelf: 'center',
-        fontSize: 24,
-    },
-
     searchBarDiv: {
         width: "80%",
-        borderBottomColor: 'black',
-        borderBottomWidth: 1
+        marginTop: 16,
     },
 
     searchBar: {
         fontSize: 32,
-        alignSelf: 'center',
-        textDecorationLine: 'none',
     },
 
     backgroundDiv: {
         margin: 16,
         padding: 24,
-        backgroundColor: 'black',
+        backgroundColor: '#272727',
         borderRadius: 25,
     },
 
