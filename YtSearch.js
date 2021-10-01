@@ -5,6 +5,7 @@ import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighligh
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 
 import ytdl from 'react-native-ytdl';
+import RNFS from 'react-native-fs';
 
 import Screens from './Screens';
 import { YT_API_KEY } from './API';
@@ -15,6 +16,7 @@ export default function YtSearch(props) {
     // we lose states from those components because they aren't initialized
     const [searchText, setSearchText] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+    const [isDownloading, setDownloading] = useState(false);
 
     const ytType = "video";
     const ytMaxRecords = 5;
@@ -22,7 +24,7 @@ export default function YtSearch(props) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-    const requestFilePermission = async() => {
+    const requestFilePermission = async(url, title) => {
         try {
             const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -36,7 +38,7 @@ export default function YtSearch(props) {
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                 console.log("You can use files");
-                await getMusicFiles();
+                download_and_save(url, title);
             } else {
                 console.log("File permission denied");
                 // Ask for permission again
@@ -52,9 +54,9 @@ export default function YtSearch(props) {
     };
 
     const search = async() => {
-        await fetch(yt_request + searchText, {
+        fetch(yt_request + searchText, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json;charset=utf-8' },
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
         })
         .then(response => response.json())
         .then(result => {
@@ -73,17 +75,52 @@ export default function YtSearch(props) {
         .catch(error => console.error(error));
     };
 
-    const download = async(url) => {
-        const youtubeURL = 'http://www.youtube.com/watch?v=04GiqLjRO3A';
-        console.log(ytdl.validateURL(url));
-        const urls = ytdl.getInfo(youtubeURL).then(ele => console.log(ele)).catch(err => console.error(err));
-        console.log(urls)
+    const download_and_save = async(url, title) => {
+        setDownloading(true);
+        const urls = await ytdl(url, { quality: 'highestaudio' });
+        
+        if (!urls.length) {
+            console.log("Could not download!");
+            return;
+        }
+
+        const path = RNFS.ExternalStorageDirectoryPath + `/Download/${title}.mp3`;
+        console.log(path);
+        RNFS.downloadFile({
+            fromUrl: urls[0].url,
+            toFile: path,
+        })
+        .promise.then(res => {
+            console.log(res);
+            setDownloading(false);
+        })
+        .catch(err => console.error(err));
     };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
     
     // Render components
-    return (
+    if (isDownloading) {
+        return (
+            <>
+                <View style={styles.topBarDiv}>
+                    <View style={styles.buttonDiv}>
+                        <IconAntDesign name="back" size={48} color="#FFFFFF00" />
+                    </View>
+                    <Text style={styles.topBarText}>
+                        Download a song
+                    </Text>
+                    <View style={styles.buttonDiv}>
+                        <IconAntDesign name="back" size={48} color="#FFFFFF00" />
+                    </View>
+                </View>
+                <View style={styles.container}>
+                    <Text style={styles.downloadingText}>Downloading...</Text>
+                </View>
+            </>
+        );
+    }
+    else return (
         <>
             <View style={styles.topBarDiv}>
                 <View style={styles.buttonDiv}>
@@ -103,7 +140,7 @@ export default function YtSearch(props) {
                 keyExtractor = {(item) => item.id}
                 data = {searchResults}
                 renderItem={({item}) =>
-                <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD" onPress={() => download(item.url)} >
+                <TouchableHighlight activeOpacity={0.6} underlayColor="#DDDDDD" onPress={() => requestFilePermission(item.url, item.title)} >
                     <View style={styles.backgroundDiv} >
                         <Image source={{ uri: item.thumbnail }} style={styles.listItemImage} />
                         <Text style={styles.listItem}> {item.title} </Text>
@@ -119,6 +156,20 @@ export default function YtSearch(props) {
 
 // CSS
 const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'column',
+        flex: 1,
+        backgroundColor: 'grey',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    downloadingText: {
+        fontSize: 36,
+        color: 'white',
+        fontWeight: 'bold',
+    },
+
     buttonDiv: {
         backgroundColor: 'black',
         padding: 8,
