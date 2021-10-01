@@ -13,6 +13,11 @@ export default function SongTitle(props) {
         props.setCurrentScreen(Screens.ALBUMS)
     };
 
+    const switchYTSearch = async() => {
+        await props.resetPlayer();
+        props.setCurrentScreen(Screens.YTSEARCH);
+    };
+
 /////////////////////////////////////////////////////////////////////////////////////////////
     const { colors } = useTheme();
 
@@ -20,7 +25,7 @@ export default function SongTitle(props) {
     return (
     <>
         <Appbar.Header style={{width: '100%'}}>
-            <Appbar.Action />
+            <Appbar.Action icon="download" onPress={() => switchYTSearch()}/>
             <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Home" />
             <Appbar.Action icon="tune" onPress={() => switchAlbums()}/>
         </Appbar.Header>
