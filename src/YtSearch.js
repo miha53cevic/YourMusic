@@ -8,7 +8,7 @@ import RNFS from 'react-native-fs';
 import Screens from './Screens';
 import { YT_API_KEY } from './API';
 
-import { Appbar, TextInput } from 'react-native-paper';
+import { Appbar, TextInput, ProgressBar, Colors } from 'react-native-paper';
 
 export default function YtSearch(props) {
     // Note for future self
@@ -18,6 +18,7 @@ export default function YtSearch(props) {
     const [searchResults, setSearchResults] = useState([]);
     const [isDownloading, setDownloading] = useState(false);
     const [downloadingStatusText, setDownloadingStatusText] = useState("Downloading...");
+    const [downloadProgress, setDownloadProgress] = useState(0);
 
     const ytType = "video";
     const ytMaxRecords = 5;
@@ -115,11 +116,17 @@ export default function YtSearch(props) {
             return;
         }
 
-        const path = RNFS.ExternalStorageDirectoryPath + `/Download/${title}.mp3`;
+        //const path = RNFS.ExternalStorageDirectoryPath + `/Download/${title}.mp3`;
+        const path = RNFS.DownloadDirectoryPath + `/${title}.mp3`;
         console.log(path);
         RNFS.downloadFile({
             fromUrl: urls[0].url,
             toFile: path,
+            connectionTimeout: 60,
+            progress: (res) => {
+                const progressPercent = (res.bytesWritten / res.contentLength); // 0.0 - 1.0
+                setDownloadProgress(progressPercent);
+            },
         })
         .promise.then(res => {
             console.log(res);
@@ -129,7 +136,7 @@ export default function YtSearch(props) {
         })
         .catch(err => {
             console.error(err);
-            setDownloadingStatusText("An error has occured");
+            setDownloadingStatusText(err);
         });
     };
 
@@ -146,6 +153,7 @@ export default function YtSearch(props) {
                 </Appbar.Header>
                 <View style={styles.container}>
                     <Text style={styles.downloadingText}>{downloadingStatusText}</Text>
+                    <ProgressBar style={styles.progressBar} progress={downloadProgress} color={Colors.purple100} />
                 </View>
             </>
         );
@@ -183,7 +191,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         flex: 1,
-        alignItems: 'center',
         justifyContent: 'center',
     },
 
@@ -191,6 +198,11 @@ const styles = StyleSheet.create({
         fontSize: 36,
         color: 'white',
         fontWeight: 'bold',
+        textAlign: 'center',
+    },
+
+    progressBar: {
+        height: 12,
     },
 
     buttonDiv: {
