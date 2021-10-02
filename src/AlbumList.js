@@ -5,6 +5,7 @@ import MediaStore from 'react-native-mediastore';
 
 import Screens from './Screens';
 import States from './States';
+import { read_permissions } from './Permissions';
 
 import TrackPlayer from 'react-native-track-player';
 import { Appbar, TextInput } from 'react-native-paper';
@@ -71,34 +72,9 @@ export default function AlbumList(props) {
         props.setAlbumArray(tempAlbum);
     }
 
-    const requestFilePermission = async() => {
-        try {
-            const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-            {
-                title: "YourMusic needs Permission",
-                message: "For the app to work properly read permissions are needed",
-                buttonNeutral: "Ask Me Later",
-                buttonNegative: "Cancel",
-                buttonPositive: "OK"
-            }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log("You can use files");
-                await getMusicFiles();
-            } else {
-                console.log("File permission denied");
-                // Ask for permission again
-                requestFilePermission();
-            }
-        } catch (err) {
-            console.warn(err);
-        }
-    };
-
     // On first time, auto-refresh
     if (props.musicFiles == null) {
-        requestFilePermission();
+        read_permissions(async() => getMusicFiles());
     }
 
     // On flatlist item press    
@@ -128,7 +104,7 @@ export default function AlbumList(props) {
     return (
         <>
             <Appbar.Header style={{width: '100%'}}>
-                <Appbar.Action icon="refresh" onPress={() => requestFilePermission()} />
+                <Appbar.Action icon="refresh" onPress={() => read_permissions(async() => getMusicFiles())} />
                 <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Choose song folder" />
                 <Appbar.Action icon="keyboard-return" onPress={() => props.setCurrentScreen(Screens.HOME)} />
             </Appbar.Header>

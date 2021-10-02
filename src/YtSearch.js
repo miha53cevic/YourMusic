@@ -7,6 +7,7 @@ import RNFS from 'react-native-fs';
 
 import Screens from './Screens';
 import { YT_API_KEY } from './API';
+import { read_permissions, write_permissions } from './Permissions';
 
 import { Appbar, TextInput, ProgressBar, Colors } from 'react-native-paper';
 
@@ -27,58 +28,7 @@ export default function YtSearch(props) {
 /////////////////////////////////////////////////////////////////////////////////////////////
 
     const requestFilePermission = async(url, title) => {
-
-        const read_permissions = async() => {
-            try {
-                const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                    title: "YourMusic needs Permission",
-                    message: "For the app to work properly read permissions are needed",
-                    buttonNeutral: "Ask Me Later",
-                    buttonNegative: "Cancel",
-                    buttonPositive: "OK"
-                }
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log("You can read files");
-                    write_permissions();
-                } else {
-                    console.log("File permission denied");
-                    // Ask for permission again
-                    requestFilePermission(url, title);
-                }
-            } catch (err) {
-                console.warn(err);
-            }
-        };
-
-        const write_permissions = async() => {
-            try {
-                const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: "YourMusic needs Permission",
-                    message: "For the app to work properly write permissions are needed",
-                    buttonNeutral: "Ask Me Later",
-                    buttonNegative: "Cancel",
-                    buttonPositive: "OK"
-                }
-                );
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log("You can write files");
-                    download_and_save(url, title);
-                } else {
-                    console.log("File permission denied");
-                    // Ask for permission again
-                    requestFilePermission(url, title);
-                }
-            } catch (err) {
-                console.warn(err);
-            }
-        };
-
-        read_permissions();
+        read_permissions(() => write_permissions(() => download_and_save(url, title)));
     };
 
     const onSearchTextChange = (text) => {
