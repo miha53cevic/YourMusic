@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight } from 'react-native';
 
-import MediaStore from 'react-native-mediastore';
+import MusicFiles from 'react-native-get-music-files-v3dev-test';
 
 import Screens from './Screens';
 import States from './States';
@@ -21,22 +21,22 @@ export default function AlbumList(props) {
     const getMusicFiles = async() => {
 
         // Find every song that is a .mp3
-        let result = await MediaStore.readAudioVideoExternalMedias();
-        result = result.filter(r => r.mime.startsWith("audio/")); // instead of this maybe mime starts with "audio/"
-        console.log(`Found ${result.length} songs!`);
+        const { results } = await MusicFiles.getAll({});
+        console.log(`Found ${results.length} songs!`);
 
         // Create map with all subfolders containing the songs
         const musicMap = new Map();
-        for (const track of result) {
+        for (const track of results) {
             // example: content://Music/MyAlbum/track.mp3
-            const subfolder = track.album;
+            const location = track.path.split('/');
+            const subfolder = location[location.length - 2];
             if (!musicMap.has(subfolder)) {
                 musicMap.set(subfolder, []);
             }
 
             const duration = track.duration / 1000;            
             const formatedTrack = {
-                url: track.contentUri,
+                url: track.path,
                 duration: duration,
                 title: track.title,
                 id: track.id,
