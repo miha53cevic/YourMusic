@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, PermissionsAndroid, TouchableHighlight } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableHighlight } from 'react-native';
 
 import MediaStore from 'react-native-mediastore';
 
-import Screens from './Screens';
-import States from './States';
 import { read_permissions } from './Permissions';
 
-import TrackPlayer from 'react-native-track-player';
-import { Appbar, TextInput } from 'react-native-paper';
+/**
+ * Note for future self:
+ * - by using react router TrackPlayer seems to have 2 different instances in Home and AlbumList
+ * - so if you try to do TrackPlayer.add() it won't update the state in Home
+ */
+import { Track } from 'react-native-track-player';
 
-export default function AlbumList(props) {
+import { Appbar, TextInput } from 'react-native-paper';
+import { useNavigate } from 'react-router-native';
+
+import AppContext, { IAppContext, IMusicMap } from '../../AppContext';
+
+export default function AlbumList() {
     // Note for future self
     // albumList can't be here because everytime we switch screens
     // we lose states from those components because they aren't initialized
-    const [searchText, setSearchText] = useState("");
+    const appContext = useContext<IAppContext | {}>(AppContext) as IAppContext;
+
+    const router = useNavigate();
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+    const [searchText, setSearchText] = useState<string>("");
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,31 +35,34 @@ export default function AlbumList(props) {
 
         // Find every song that is a .mp3
         let result = await MediaStore.readAudioVideoExternalMedias();
+        // @ts-ignore because .mime does exist
         result = result.filter(r => r.mime.startsWith("audio/")); // instead of this maybe mime starts with "audio/"
         console.log(`Found ${result.length} songs!`);
 
         // Create map with all subfolders containing the songs
-        const musicMap = new Map();
+        const musicMap: IMusicMap = new Map();
         for (const track of result) {
             // example: content://Music/MyAlbum/track.mp3
-            const subfolder = track.album;
+            // @ts-ignore
+            const subfolder: string = track.album;
             if (!musicMap.has(subfolder)) {
                 musicMap.set(subfolder, []);
             }
 
             const duration = track.duration / 1000;            
-            const formatedTrack = {
+            const formatedTrack: Track = {
                 url: track.contentUri,
                 duration: duration,
-                title: track.title,
-                id: track.id,
+                title: track.name,
+                id: `${track.id}`,
+                artist: ''
             };
-            musicMap.get(subfolder).push(formatedTrack);
+            musicMap.get(subfolder)?.push(formatedTrack);
         }
         
         // If empty set empty map
         if (!musicMap.size) {
-            props.setMusicFiles(new Map());
+            appContext.setMusicMap(new Map());
             return;
         }
 
@@ -55,10 +71,10 @@ export default function AlbumList(props) {
 
         // Log and add to musicFiles so we don't have to do this search again
         console.log(musicMap);
-        props.setMusicFiles(musicMap);
+        appContext.setMusicMap(musicMap);
 
         // create albums array for FlatList
-        const tempAlbum = [];
+        const tempAlbum: string[] = [];
         const iterator = musicMap.keys();
         let album = iterator.next().value;
         while (album != undefined) {
@@ -69,47 +85,50 @@ export default function AlbumList(props) {
             }
             album = iterator.next().value;
         }
-        props.setAlbumArray(tempAlbum);
+        appContext.setAlbumArray(tempAlbum);
     }
 
     // On first time, auto-refresh
-    if (props.musicFiles == null) {
+    if (appContext.musicMap == null) {
         read_permissions(async() => getMusicFiles());
     }
 
     // On flatlist item press    
-    const playAlbum = async(album) => {
+    const playAlbum = async(album: string) => {
         // add songs to trackplayer
-        TrackPlayer.add(props.musicFiles.get(album));
+        //await TrackPlayer.add(appContext.musicMap?.get(album) as TrackPlayer.Track[]);
 
         // Set to autostart playing
-        props.setState(States.PLAYING);
-
-        // Send back to main screen
-        props.setCurrentScreen(Screens.HOME);
+        appContext.setPlayerPaused(false);
 
         // Set current album, used for shuffling later
-        props.setCurAlbum(album);
+        appContext.setCurrentAlbum(album);
         console.log(`playAlbum() called with album: ${album}`)
+
+        // Send back to main screen
+        router('/');
     }
 
-    const onSearchTextChange = (text) => {
+    const onSearchTextChange = (text: string) => {
         setSearchText(text);
     };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-    const albums = props.albumArray.filter(album => album.toLowerCase().includes(searchText.toLowerCase()));
+    const albums = appContext.albumArray.filter(album => album.toLowerCase().includes(searchText.toLowerCase()));
 
     // Render components
     return (
         <>
             <Appbar.Header style={{width: '100%'}}>
+                {/* @ts-ignore */}
                 <Appbar.Action icon="refresh" onPress={() => read_permissions(async() => getMusicFiles())} />
                 <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Choose song folder" />
-                <Appbar.Action icon="keyboard-return" onPress={() => props.setCurrentScreen(Screens.HOME)} />
+                {/* @ts-ignore */}
+                <Appbar.Action icon="keyboard-return" onPress={() => router('/')} />
             </Appbar.Header>
             <View style={styles.searchBarDiv}>
-                <TextInput style={styles.searchBar} laceholder={"Search"} onChangeText={text => onSearchTextChange(text)}></TextInput>
+                {/* @ts-ignore */}
+                <TextInput style={styles.searchBar} placeholder={"Search"} onChangeText={text => onSearchTextChange(text)}></TextInput>
             </View>
             <FlatList style={styles.flatlist}
                 keyExtractor = {(item) => item.toString()}

@@ -1,14 +1,28 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
 
-import States from './States';
+import AppContext, { IAppContext } from '../../AppContext';
 
-export default function Controls(props) {
-    const [playPause, setPlayPause] = useState(props.state == States.PAUSED ? 'play-circle' : 'pause-circle');
+interface Props {
+    repeat: boolean,
+    setRepeat: (repeat: boolean) => void,
+    shuffle: boolean,
+    setShuffle: (shuffle: boolean) => void,
+    setLoopTrack: (loopTrack: string | null) => void,
+    shuffleTracks: (shuffle: boolean) => Promise<void>,
+};
+
+function Controls(props: Props) {
+
+    const appContext = useContext<IAppContext | {}>(AppContext) as IAppContext;
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+    const [playPause, setPlayPause] = useState(appContext.playerPaused ? 'play-circle' : 'pause-circle');
     const [repeatColour, setRepeatColour] = useState(props.repeat ? 'grey' : 'white');
     const [shuffleColour, setShuffleColour] = useState(props.shuffle ? 'grey' : 'white');
 
@@ -17,10 +31,10 @@ export default function Controls(props) {
     const onClickPlayPause = () => {
         if (playPause === 'play-circle') {
             setPlayPause('pause-circle');
-            props.setState(States.PLAYING)
+            appContext.setPlayerPaused(false)
         } else if (playPause === 'pause-circle') {
             setPlayPause('play-circle');
-            props.setState(States.PAUSED);
+            appContext.setPlayerPaused(true)
         }
     };
     
@@ -79,15 +93,22 @@ export default function Controls(props) {
     return (
         <View style={styles.controlDiv}>
             <View style={styles.mediaControls}>
+                {/*@ts-ignore */}
                 <IconButton style={styles.repeControl} icon="replay" size={48} color={repeatColour} onPress={() => onClickRepeat()} />
+                {/*@ts-ignore */}
                 <IconButton style={styles.backControl} icon="skip-previous" size={48} color="white" onPress={() => onClickBackward()} />
+                {/*@ts-ignore */}
                 <IconButton onPress={() => onClickPlayPause()} style={styles.playPause} icon={playPause} size={96} color="white" />
+                {/*@ts-ignore */}
                 <IconButton style={styles.forwControl} icon="skip-next" size={48} color="white" onPress={() => onClickForward()} />
+                {/*@ts-ignore */}
                 <IconButton style={styles.loopControl} icon="shuffle" size={48} color={shuffleColour} onPress={() => onClickShuffle()} />
             </View>
         </View>
     );
 }
+
+export default Controls;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 

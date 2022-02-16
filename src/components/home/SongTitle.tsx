@@ -1,21 +1,22 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar, Title, useTheme } from 'react-native-paper';
+import { useNavigate } from 'react-router-native';
 
-import Screens from './Screens';
+interface Props {
+    resetPlayer: () => Promise<void>,
+    trackTitle: string,
+};
 
-export default function SongTitle(props) {
+function SongTitle(props: Props) {
+
+    const router = useNavigate();
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-    const switchAlbums = async() => {
+    const switchToAlbums = async() => {
         await props.resetPlayer();
-        props.setCurrentScreen(Screens.ALBUMS)
-    };
-
-    const switchYTSearch = async() => {
-        await props.resetPlayer();
-        props.setCurrentScreen(Screens.YTSEARCH);
+        router('/album');
     };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,16 +26,20 @@ export default function SongTitle(props) {
     return (
     <>
         <Appbar.Header style={{width: '100%'}}>
-            <Appbar.Action icon="download" onPress={() => switchYTSearch()}/>
+            {/*@ts-ignore - because it wants props that don't do anything and that just fluff up the code */}
+            <Appbar.Action />
             <Appbar.Content titleStyle={{ textAlign: 'center' }} title="Home" />
-            <Appbar.Action icon="tune" onPress={() => switchAlbums()}/>
+            {/*@ts-ignore*/}
+            <Appbar.Action icon="tune" onPress={() => switchToAlbums()}/>
         </Appbar.Header>
         <View style={[styles.titleDiv, {backgroundColor: colors.background}]}>
             <Title style={styles.title}>{props.trackTitle}</Title>
         </View>
     </>
     );
-}
+};
+
+export default SongTitle;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 

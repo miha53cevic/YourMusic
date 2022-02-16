@@ -5,13 +5,13 @@ import Slider from '@react-native-community/slider';
 
 import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player'
 
-function toInt(number) {
+function toInt(number: number) {
     return Number.parseInt((number).toString());
 }
 
-function formatter(time) {
-    let minutes = toInt(time / 60);
-    let seconds = toInt(time % 60);
+function formatter(time: number) {
+    let minutes: number | string = toInt(time / 60);
+    let seconds: number | string = toInt(time % 60);
 
     if (minutes < 10) {
         minutes = '0' + minutes.toString();
@@ -23,7 +23,7 @@ function formatter(time) {
     return `${minutes}:${seconds}`;
 }
 
-export default function ProgressBar() {
+function ProgressBar() {
     const progress = useTrackPlayerProgress();
 
     const cur_time = formatter(progress.position);
@@ -31,7 +31,7 @@ export default function ProgressBar() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-    const sliderSeek = (value) => {
+    const sliderSeek = async (value: number) => {
         TrackPlayer.seekTo(value)
             .then(_ => {})
             .catch(error => console.error(error));
@@ -57,6 +57,8 @@ export default function ProgressBar() {
     );
 }
 
+export default ProgressBar;
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 // CSS
@@ -64,7 +66,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         padding: 16,
-        backgroundColor: 'black',
         width: '100%',
         backgroundColor: '#272727',
     },

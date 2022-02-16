@@ -1,6 +1,6 @@
 import { PermissionsAndroid } from 'react-native';
 
-export const read_permissions = async(callbackFunction) => {
+export const read_permissions = async(callbackFunction: Function) => {
     try {
         const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -18,14 +18,14 @@ export const read_permissions = async(callbackFunction) => {
         } else {
             console.log("File permission denied");
             // Ask for permission again
-            requestFilePermission(url, title);
+            read_permissions(callbackFunction);
         }
     } catch (err) {
         console.warn(err);
     }
 };
 
-export const write_permissions = async(callbackFunction) => {
+export const write_permissions = async(callbackFunction: Function) => {
     try {
         const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -43,7 +43,7 @@ export const write_permissions = async(callbackFunction) => {
         } else {
             console.log("File permission denied");
             // Ask for permission again
-            requestFilePermission(url, title);
+            write_permissions(callbackFunction);
         }
     } catch (err) {
         console.warn(err);

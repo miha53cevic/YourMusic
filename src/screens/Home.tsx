@@ -1,34 +1,29 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StatusBar } from 'react-native';
 
-import SongTitle from './SongTitle';
-import Controls from './Controls';
-import AlbumList from './AlbumList';
-import ProgressBar from './ProgressBar';
-import SongList from './SongList';
-import YtSearch from './YtSearch';
+import SongTitle from '../components/home/SongTitle';
+import ProgressBar from '../components/home/ProgressBar';
+import Controls from '../components/home/Controls';
+import SongList from '../components/home/SongList';
 
-import Screens from './Screens';
-import States from './States';
+import AppContext, { IAppContext } from '../AppContext';
 
 import TrackPlayer, { useTrackPlayerEvents } from 'react-native-track-player';
 import { useTheme } from 'react-native-paper';
 
-export default function App() {
-    const [currentScreen, setCurrentScreen] = useState(Screens.HOME);
-    const [state, setState] = useState(States.PAUSED);
-    const [musicFiles, setMusicFiles] = useState(null);
-    const [albumArray, setAlbumArray] = useState([]);
-    const [trackTitle, setTrackTitle] = useState("");
-    const [repeat, setRepeat] = useState(false);
-    const [shuffle, setShuffle] = useState(false);
-    const [curAlbum, setCurAlbum] = useState("");
-    const [loopTrack, setLoopTrack] = useState("");
+function Home() {
+
+    const appContext = useContext<IAppContext | {}>(AppContext) as IAppContext;
+
+    const [trackTitle, setTrackTitle] = useState<string>("");
+    const [repeat, setRepeat] = useState<boolean>(false);
+    const [shuffle, setShuffle] = useState<boolean>(false);
+    const [loopTrack, setLoopTrack] = useState<string | null>(null);
 
     // Initialize TrackPlayer
-    useEffect(async () => {
+    useEffect(() => {
         async function setupTrackPlayer() {
             await TrackPlayer.setupPlayer();
 
@@ -52,6 +47,16 @@ export default function App() {
         setupTrackPlayer();
     }, []);
 
+    // Add songs to trackPlayer whenever album is changed
+    useEffect(() => {
+        async function updateTracks() {
+            if (appContext.currentAlbum == null) return;
+            
+            await TrackPlayer.add(appContext.musicMap?.get(appContext.currentAlbum) as TrackPlayer.Track[]);
+        };
+        updateTracks();
+    }, [appContext.currentAlbum]);
+
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     // Reset Player
@@ -60,16 +65,16 @@ export default function App() {
             .then(_ => console.log("Reset Player"))
             .catch(error => console.error(error));
 
-        setState(States.PAUSED);
-        setCurAlbum("");
+        appContext.setPlayerPaused(true);
+        appContext.setCurrentAlbum(null);
     }
 
     // Play / Pause
-    if (state == States.PLAYING) {
+    if (!appContext.playerPaused) {
         TrackPlayer.play()
             .then(_ => console.log("Playing"))
             .catch(error => console.error(error));
-    } else if (state == States.PAUSED) {
+    } else if (appContext.playerPaused) {
         TrackPlayer.pause()
             .then(_ => console.log("Pausing"))
             .catch(error => console.error(error));
@@ -89,23 +94,26 @@ export default function App() {
     });
 
     const checkAndLoopTrack = async() => {
-        if (repeat && albumArray != "") {
+        if (repeat && loopTrack) {
             const currentTrack = await TrackPlayer.getCurrentTrack();
             if (currentTrack != loopTrack) {
                 TrackPlayer.skip(loopTrack)
-                    .then(_ => console.log(`Repeating track: ${musicFiles.get(curAlbum).filter(t => t.id == loopTrack)[0].title}`))
+                    .then(_ => {
+                        const currAlbumArray = appContext.musicMap?.get(appContext.currentAlbum as string) as TrackPlayer.Track[];
+                        console.log(`Repeating track: ${currAlbumArray.filter(t => t.id == loopTrack)[0].title}`)
+                    })
                     .catch(error => console.log(error));
             }
         }
     };
 
-    const shuffleTracks = async(shuffle) => {
+    const shuffleTracks = async(shuffle: boolean) => {
         // If no album is selected don't try to shuffle
-        if (curAlbum == "") return;
+        if (appContext.currentAlbum == null) return;
 
         await TrackPlayer.reset();
 
-        let tracksArray = [...musicFiles.get(curAlbum)];
+        let tracksArray = [...appContext.musicMap?.get(appContext.currentAlbum) as TrackPlayer.Track[]];
         if (shuffle) {
             tracksArray = tracksArray.sort((a, b) => 0.5 - Math.random());
         }
@@ -116,50 +124,26 @@ export default function App() {
     /////////////////////////////////////////////////////////////////////////////////////////////
     const themeBackgroundColour = useTheme().colors.background;
 
-    // Render components
-    if (currentScreen == Screens.HOME) {
-        return (
-            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
-                <StatusBar hidden={true} />
+    return (
+        <View style={[styles.container, { backgroundColor: themeBackgroundColour }]}>
+            <StatusBar hidden={true} />
 
-                <SongTitle setCurrentScreen={setCurrentScreen} resetPlayer={resetPlayer}
-                    trackTitle={trackTitle} />
+            <SongTitle resetPlayer={resetPlayer} trackTitle={trackTitle} />
 
-                <ProgressBar />
+            <ProgressBar />
 
-                <Controls state={state} setState={setState}
-                            repeat={repeat} setRepeat={setRepeat} 
-                            shuffle={shuffle} setShuffle={setShuffle} 
-                            setLoopTrack={setLoopTrack} 
-                            shuffleTracks={shuffleTracks} />
-                
-                <SongList tracks={musicFiles != null ? musicFiles.get(curAlbum) : []} 
-                            repeat={repeat} />
-            </View>
-        );
-    } else if (currentScreen == Screens.ALBUMS) {
-        return (
-            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
-                <StatusBar hidden={true} />
+            <Controls
+                repeat={repeat} setRepeat={setRepeat}
+                shuffle={shuffle} setShuffle={setShuffle}
+                setLoopTrack={setLoopTrack}
+                shuffleTracks={shuffleTracks} />
 
-                <AlbumList setCurrentScreen={setCurrentScreen}
-                    musicFiles={musicFiles} setMusicFiles={setMusicFiles}
-                    albumArray={albumArray} setAlbumArray={setAlbumArray}
-                    setState={setState} 
-                    setCurAlbum={setCurAlbum} />
+            <SongList repeat={repeat} />
+        </View>
+    );
+};
 
-            </View>
-        );
-    } else if (currentScreen == Screens.YTSEARCH) {
-        return (
-            <View style={[styles.container, {backgroundColor: themeBackgroundColour}]}>
-                <StatusBar hidden={true} />
-
-                <YtSearch setCurrentScreen={setCurrentScreen} />
-            </View>
-        );
-    }
-}
+export default Home;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
