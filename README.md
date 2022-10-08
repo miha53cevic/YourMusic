@@ -1,4 +1,4 @@
-# your_player - Android app using Flutter
+# YourMusic - Android app using Flutter
 
 YourMusic is an app that aims to allow users to play local songs and easily create playlists by just dropping songs into folders
 
