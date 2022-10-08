@@ -1,23 +1,12 @@
-# YourMusic - Android App using ReactNative
+# your_player - Android app using Flutter
 
 YourMusic is an app that aims to allow users to play local songs and easily create playlists by just dropping songs into folders
 
 ## Screenshots
-![](screenshots/img1.png)
-![](screenshots/img2.png)
-![](screenshots/img3.png)
+![](./screenshots/1.png)
+![](./screenshots/2.png)
+![](./screenshots/3.png)
+![](./screenshots/4.png)
 
-## Creating playlists
-Just drag and drop your songs into a new folder, for example myplaylist
-The file structure would then look like
- - Music
-    - myplaylist
-        - song1
-        - song2
-    - mysecondplaylist
-        - song3
-        - song4
- - Videos 
- - Android
-
-Music can be placed anywhere in your android filesystem, the only requirement are that the songs are .mp3 format!!!
+## Note
+Songs should be placed outside the downloads folder
