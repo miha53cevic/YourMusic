@@ -2,6 +2,8 @@
 
 YourMusic is an app that aims to allow users to play local songs and easily create playlists by just dropping songs into folders
 
+[Google Play Link](https://play.google.com/store/apps/details?id=com.yourmusic)
+
 ## Screenshots
 ![](./screenshots/1.png)
 ![](./screenshots/2.png)
